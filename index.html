@@ -1,199 +1,563 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0f172a">
-<meta name="description" content="Controle financeiro para motorista de aplicativo (Uber)">
-<title>Controle Uber</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Controle Financeiro – Motorista de App</title>
 <style>
-:root{color-scheme:dark light;--bg:#0f172a;--cd:#1e293b;--tx:#e2e8f0;--mu:#94a3b8;--bd:#334155;--ac:#22c55e;--wn:#fbbf24;--bad:#f87171}
-@media(prefers-color-scheme:light){:root{--bg:#f1f5f9;--cd:#fff;--tx:#0f172a;--mu:#64748b;--bd:#e2e8f0;--ac:#15803d;--wn:#b45309;--bad:#b91c1c}}
+:root{--bg:#f4f6f8;--card:#fff;--txt:#1b2430;--mut:#667085;--pri:#0b7a5b;--bd:#dde3ea;--bad:#c62828;--warn:#b26a00;--ok:#1b7f3b}
+@media(prefers-color-scheme:dark){:root{--bg:#10151b;--card:#1a222b;--txt:#e8edf2;--mut:#93a1b1;--pri:#1f9d76;--bd:#2c3744;--bad:#ff6b6b;--warn:#ffb74d;--ok:#5fd38a}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,sans-serif;padding:env(safe-area-inset-top) 0 calc(64px + env(safe-area-inset-bottom))}
-header{padding:14px 16px 2px;max-width:720px;margin:auto}header b{font-size:20px}header small{display:block;color:var(--mu)}
-main{max-width:720px;margin:auto;padding:8px 12px}
-.card{background:var(--cd);border:1px solid var(--bd);border-radius:14px;padding:14px;margin-bottom:12px}
-h3{margin:0 0 8px;font-size:16px}p{margin:6px 0}.mu,small{color:var(--mu)}
-label{display:block;font-size:12px;color:var(--mu);margin:8px 0 2px}
-input,select{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);font:inherit}
-input[type=checkbox]{width:auto;margin-right:6px}
-.g,.gk{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.gk{gap:8px}
-.k{background:var(--bg);border-radius:10px;padding:8px}.k b{display:block;font-size:16px}
-.big{text-align:center;margin:10px 0}.big b{display:block;font-size:30px}
-.ok{color:var(--ac)}.bad{color:var(--bad)}
-button.p{width:100%;margin-top:12px;padding:12px;border:0;border-radius:10px;background:var(--ac);color:#04210f;font:inherit;font-weight:700}
-button.x{background:none;border:1px solid var(--bd);color:var(--mu);border-radius:8px;padding:2px 8px;margin-left:6px}
-.t{border-left:3px solid var(--mu);padding-left:8px}.t.w{border-color:var(--wn)}.t.o{border-color:var(--ac)}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--cd);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
-nav button{flex:1;background:none;border:0;color:var(--mu);padding:14px 2px;font:inherit;font-size:12px}nav button.on{color:var(--ac);font-weight:700}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,Segoe UI,sans-serif;background:var(--bg);color:var(--txt)}
+header{padding:14px 16px;background:var(--pri);color:#fff}
+header h1{margin:0;font-size:18px}
+header small{opacity:.85}
+nav{display:flex;overflow-x:auto;gap:4px;padding:8px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:5}
+nav button{flex:none;border:0;background:transparent;color:var(--txt);padding:8px 12px;border-radius:8px;cursor:pointer;font:inherit}
+nav button.on{background:var(--pri);color:#fff}
+main{max-width:980px;margin:0 auto;padding:12px}
+h2{margin:0 0 10px;font-size:17px}
+h3{margin:14px 0 6px;font-size:15px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-bottom:12px}
+.flash{border-color:var(--pri)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:10px}
+label{display:flex;flex-direction:column;font-size:12.5px;color:var(--mut);gap:3px}
+label.chk{flex-direction:row;align-items:center;gap:6px;font-size:14px;color:var(--txt)}
+input,select{font:inherit;padding:8px;border:1px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--txt);width:100%}
+input[type=checkbox]{width:auto}
+.btn{font:inherit;border:0;border-radius:8px;padding:9px 14px;background:var(--pri);color:#fff;cursor:pointer;margin:2px 4px 2px 0}
+.btn.sec{background:transparent;color:var(--txt);border:1px solid var(--bd)}
+.btn.del{background:transparent;color:var(--bad);border:1px solid var(--bd);padding:3px 8px}
+.tbl{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th,td{padding:6px 8px;border-bottom:1px solid var(--bd);text-align:left;font-size:13px;white-space:nowrap}
+td.r,th.r{text-align:right}
+.ok{color:var(--ok)}.warn{color:var(--warn)}.bad{color:var(--bad)}.mut{color:var(--mut);font-size:12.5px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:10px}
+.kpi{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:10px}
+.kpi b{display:block;font-size:18px}
+.kpi span{font-size:12px;color:var(--mut)}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;border:1px solid var(--bd);font-size:12px;margin:2px 4px 2px 0}
 </style>
 </head>
 <body>
-<header><b>Controle Uber</b><small>Ganhos, custos e estratégia do seu carro</small></header>
-<main id="app"></main>
-<nav id="nav"></nav>
+<header><h1>Controle Financeiro para Motorista de App</h1>
+<small>Seus dados ficam salvos somente neste aparelho (navegador). Projeto independente, sem vínculo com a Uber. Não é aconselhamento financeiro.</small></header>
+<nav id="tabs"></nav>
+<main id="view"></main>
+
 <script>
-const $=s=>document.querySelector(s),v=i=>$('#'+i).value,num=i=>parseFloat(String(v(i)).replace(',','.'))||0;
-const R=x=>(+x||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}),N=x=>(+x||0).toLocaleString('pt-BR',{maximumFractionDigits:2}),P=x=>(x*100).toFixed(1).replace('.',',')+'%';
-const norm=s=>String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
-const iso=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-const today=()=>iso(new Date()),ago=n=>{const d=new Date();d.setDate(d.getDate()-n);return iso(d)},br=d=>d.split('-').reverse().join('/');
-const dd=(a,b)=>Math.round((new Date(b)-new Date(a))/864e5)+1,ov=(s,e,f,t)=>{const a=s>f?s:f,b=e<t?e:t;return b<a?0:dd(a,b)};
-let S;try{S=JSON.parse(localStorage.getItem('rf2'))}catch(e){}
-S=S||{city:'',car:null,fin:[],exp:[],fuel:[],days:[],set:{}};
-const save=()=>{try{localStorage.setItem('rf2',JSON.stringify(S))}catch(e){}};
+/* ================= Utilidades ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&','<':'<','>':'>','"':'&quot;',"'":'&#39;'}[c]));
+const brl=n=>(isFinite(n)?n:0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const nf=(n,d=2)=>(isFinite(n)?n:0).toLocaleString('pt-BR',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pct=n=>nf((isFinite(n)?n:0)*100,1)+'%';
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>iso(new Date());
+const addDays=(s,n)=>{const [y,m,d]=s.split('-').map(Number);return iso(new Date(y,m-1,d+n))};
+const dayNum=s=>{const [y,m,d]=s.split('-').map(Number);return Math.floor(Date.UTC(y,m-1,d)/864e5)};
+const fmtDate=s=>s?s.split('-').reverse().join('/'):'';
+const sum=(a,k)=>a.reduce((t,x)=>t+(+x[k]||0),0);
+const norm=s=>String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+const N=v=>{const x=parseFloat(String(v).replace(',','.'));return isFinite(x)?x:0};
+const sorted=a=>[...a].sort((x,y)=>y.data.localeCompare(x.data));
+const COMB={gasolina:'Gasolina',etanol:'Etanol',eletrico:'Elétrico (kWh)'};
+const DIAS=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 
-/* Catálogo de REFERÊNCIA (a Uber não publica base oficial). Confira em uber.com/br/pt-br/drive/vehicle-requirements.
-   Colunas: marca|modelo|combustível|km/l gasolina|km/l etanol|km/kWh|ano mín. X|ano mín. Comfort|ano mín. Black|exclusão (C:AAAA-MM-DD)|cidade
-   Ano mínimo 0 = modelo não aceito na categoria. Edite à vontade. */
-const CAT=`Chevrolet|Onix|FLEX|12.5|8.8|0|2012|0|0||
-Chevrolet|Onix Plus|FLEX|12.5|8.8|0|2012|2020|0||
-Chevrolet|Prisma|FLEX|11.5|8|0|2012|2018|0||
-Hyundai|HB20|FLEX|12.3|8.6|0|2012|0|0||
-Hyundai|HB20S|FLEX|12|8.4|0|2012|2020|0||
-Fiat|Argo|FLEX|12|8.4|0|2012|0|0||
-Fiat|Cronos|FLEX|11.8|8.2|0|2012|2020|0||
-Fiat|Mobi|FLEX|13.5|9.5|0|2012|0|0||
-Renault|Kwid|FLEX|14|9.8|0|2012|0|0||
-Renault|Sandero|FLEX|12|8.4|0|2012|0|0||
-Renault|Logan|FLEX|11.5|8|0|2012|2020|0|C:2026-07-06|
-Renault|Duster|FLEX|10.5|7.3|0|2012|2020|2023||
-Renault|Duster|FLEX|10.5|7.3|0|2012|2020|2023||São Paulo
-Volkswagen|Gol|FLEX|12|8.4|0|2012|0|0||
-Volkswagen|Polo|FLEX|12|8.4|0|2012|0|0||
-Volkswagen|Voyage|FLEX|11.5|8|0|2012|2018|0||
-Volkswagen|Virtus|FLEX|11.5|8|0|2012|2020|2022||
-Volkswagen|Virtus|FLEX|11.5|8|0|2012|2020|2025||São Paulo
-Nissan|Versa|FLEX|11.5|8|0|2012|2020|2022||
-Nissan|Kicks|FLEX|11.5|8|0|2012|2020|0||
-Honda|City|FLEX|11.5|8|0|2012|2020|2022||
-Honda|Civic|FLEX|11|7.7|0|2012|2018|2018||
-Toyota|Corolla|FLEX|11|7.7|0|2012|2018|2018||
-Toyota|Corolla Hybrid|HIBRIDO|16|0|0|2020|2020|2020||
-Toyota|Yaris Sedan|FLEX|11.5|8|0|2012|2020|0||
-Peugeot|208|FLEX|12|8.4|0|2012|0|0||
-Peugeot|2008|FLEX|11|7.7|0|2012|2020|2022||
-BYD|Dolphin|ELETRICO|0|0|7|2023|2023|2023||`.split('\n').map(l=>{const a=l.split('|');return{make:a[0],model:a[1],fuel:a[2],kg:+a[3],ke:+a[4],kwh:+a[5],min:{X:+a[6],C:+a[7],B:+a[8]},ex:a[9],city:a[10]}});
-const CN={X:'UberX',C:'Uber Comfort',B:'Uber Black'},BLACK=['preto','cinza','prata','branco','azul-marinho','marrom','chumbo'];
-const HIGH=['brasilia','caxias do sul','curitiba','joinville','londrina','porto alegre'];
-const minR=k=>k=='B'?4.85:HIGH.includes(norm(S.city))?4.85:4.8;
-const findE=n=>{n=norm(n);const l=CAT.filter(e=>norm(e.make+' '+e.model)==n);return l.find(e=>e.city&&norm(e.city)==norm(S.city))||l.find(e=>!e.city)};
-function elig(e,y,col,ac){const ex={};(e.ex||'').split(',').filter(Boolean).forEach(p=>{const q=p.split(':');ex[q[0]]=q[1]});
- return Object.keys(CN).map(k=>{const mn=e.min[k];let ok=false,why;
-  if(!mn)why='modelo não consta nesta categoria';else if(!ac)why='exige ar-condicionado';else if(y<mn)why='ano mínimo '+mn;
-  else if(ex[k]&&today()>=ex[k])why='modelo excluído desde '+br(ex[k]);
-  else if(k=='B'&&!BLACK.includes(norm(col)))why='cor não aceita ('+BLACK.join(', ')+')';
-  else{ok=true;why=ex[k]?'aceito até '+br(ex[k]):'ok'}
-  return{k,ok,why}})}
+/* ================= Armazenamento local ================= */
+const KEY='driverfinance_v1';
+const DEF=()=>({vehicles:[],financings:[],expenses:[],fuel:[],workdays:[],catalog:null,
+  settings:{depreciacao:10,cidade:'',viagens:0,nota:5,notaComfort:4.8,margem:30,meta:5000,diasMes:22}});
+const merge=r=>{const d=DEF();return {...d,...r,settings:{...d.settings,...(r.settings||{})}}};
+function load(){try{const r=JSON.parse(localStorage.getItem(KEY));return r?merge(r):DEF()}catch(e){return DEF()}}
+let S=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('Não foi possível salvar: armazenamento cheio ou bloqueado.')}}
+if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 
-const MAINT=['MAN','OLE','PNE','FRE','REV'];
-const ET=[['MAN','Manutenção'],['OLE','Troca de óleo'],['PNE','Pneus'],['FRE','Freios'],['REV','Revisão'],['SEG','Seguro'],['IPV','IPVA'],['LIC','Licenciamento'],['LAV','Lavagem'],['MUL','Multa'],['PED','Pedágio'],['OUT','Outros']];
-const FN={G:'Gasolina',E:'Etanol',K:'Elétrico'},RN={U:'única',M:'mensal',A:'anual'};
+/* ================= Catálogo e regras de elegibilidade ================= */
+const DEFAULT_CSV=`# marca;modelo;categoria;ano_minimo;cidade;excluido_desde;conferido_uber
+# cidade: * = todas. excluido_desde: AAAA-MM-DD ou DD/MM/AAAA (vazio = sem exclusão)
+# ATENÇÃO: anos mínimos abaixo são valores de REFERÊNCIA (conferido_uber=NAO). Confira no site/app da Uber.
+Fiat;Mobi;UberX;2017;*;;NAO
+Fiat;Argo;UberX;2017;*;;NAO
+Fiat;Cronos;UberX;2018;*;;NAO
+Chevrolet;Onix;UberX;2012;*;;NAO
+Chevrolet;Onix Plus;UberX;2020;*;;NAO
+Chevrolet;Cruze;UberX;2012;*;;NAO
+Chevrolet;Cruze;Comfort;2016;*;;NAO
+Hyundai;HB20;UberX;2012;*;;NAO
+Hyundai;HB20S;UberX;2013;*;;NAO
+Renault;Kwid;UberX;2018;*;;NAO
+Renault;Logan;UberX;2012;*;;NAO
+Renault;Logan;Comfort;2016;*;06/07/2026;NAO
+Volkswagen;Gol;UberX;2012;*;;NAO
+Volkswagen;Polo;UberX;2018;*;;NAO
+Volkswagen;Virtus;UberX;2018;*;;NAO
+Volkswagen;Virtus;Comfort;2018;*;;NAO
+Nissan;Versa;UberX;2012;*;;NAO
+Nissan;Versa;Comfort;2016;*;;NAO
+Toyota;Yaris;UberX;2018;*;;NAO
+Toyota;Corolla;UberX;2012;*;;NAO
+Toyota;Corolla;Comfort;2016;*;;NAO
+Toyota;Corolla;Black;2018;*;;NAO
+Honda;City;UberX;2014;*;;NAO
+Honda;City;Comfort;2018;*;;NAO
+Honda;Civic;UberX;2012;*;;NAO
+Honda;Civic;Comfort;2016;*;;NAO
+Honda;Civic;Black;2018;*;;NAO
+`;
+function parseDate(s){if(!s)return null;s=s.trim();let m=s.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(m)return s;m=s.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);return m?`${m[3]}-${m[2]}-${m[1]}`:null}
+function parseCatalog(txt){
+  return txt.split(/\r?\n/).map(l=>l.trim()).filter(l=>l&&!l.startsWith('#'))
+   .map(l=>l.split(l.includes(';')?';':',').map(x=>x.trim()))
+   .filter(c=>norm(c[0])!=='marca'&&c.length>=4)
+   .map(c=>({marca:c[0],modelo:c[1],cat:c[2],ano:+c[3]||0,cidade:c[4]||'*',excl:parseDate(c[5]),conf:(c[6]||'NAO').toUpperCase()}));
+}
+const catalog=()=>parseCatalog(S.catalog||DEFAULT_CSV);
+const BLACK_COLORS=['preto','cinza','prata','branco','azul-marinho','azul marinho','marrom','chumbo'];
 
-/* ---------- cálculos ---------- */
-const endF=x=>{const d=new Date(x.first);d.setUTCMonth(d.getUTCMonth()+x.n);d.setUTCDate(d.getUTCDate()-1);return d.toISOString().slice(0,10)};
-const paid=x=>{const t=new Date(today()),f=new Date(x.first);if(t<f)return 0;let m=(t.getUTCFullYear()-f.getUTCFullYear())*12+t.getUTCMonth()-f.getUTCMonth();if(t.getUTCDate()<f.getUTCDate())m--;return Math.min(x.n,m+1)};
-const rate=x=>{if(x.pmt*x.n<=x.fv||x.fv<=0)return 0;let lo=1e-9,hi=.5;for(let i=0;i<200;i++){const m=(lo+hi)/2;(x.pmt*(1-Math.pow(1+m,-x.n))/m>x.fv)?lo=m:hi=m}return(lo+hi)/2};
-function real(){const s=S.fuel.filter(x=>x.odo>0).sort((a,b)=>a.odo-b.odo),acc={};let lo=-1,pend=0;
- s.forEach(x=>{pend+=x.q;if(!x.full)return;if(lo>=0&&x.odo>lo){const a=acc[x.f]=acc[x.f]||[0,0];a[0]+=x.odo-lo;a[1]+=pend}lo=x.odo;pend=0});
- const o={};for(const k in acc)o[k]=acc[k][0]/acc[k][1];return o}
-const cons=f=>real()[f]||(S.car?{G:S.car.kg,E:S.car.ke,K:S.car.kwh}[f]:0)||0;
-const lastP=f=>{const l=S.fuel.filter(x=>x.f==f).sort((a,b)=>a.d<b.d?1:-1)[0];return l?l.p:0};
-function fcpk(){if(!S.car)return 0;const l=S.fuel.slice().sort((a,b)=>a.d<b.d?1:-1)[0],f=l?l.f:(S.car.fuel=='ELETRICO'?'K':'G'),c=cons(f);return c?lastP(f)/c:0}
-function rep(n){const t=today(),f=ago(n-1),D=S.days.filter(x=>x.d>=f&&x.d<=t),s=(a,k)=>a.reduce((z,x)=>z+(+x[k]||0),0);
- const h=s(D,'h'),km=s(D,'km'),gross=s(D,'e')+s(D,'t'),F=S.fuel.filter(x=>x.d>=f&&x.d<=t),est=!F.length&&km>0;
- const fuel=est?km*fcpk():F.reduce((z,x)=>z+x.q*x.p,0);let mt=0,fx=0,vr=0,fin=0;
- S.exp.forEach(e=>{const c=e.r=='U'?(e.d>=f&&e.d<=t?e.v:0):e.v*ov(e.d,t,f,t)/(e.r=='M'?30.4375:365);if(MAINT.includes(e.k))mt+=c;else if(e.r!='U')fx+=c;else vr+=c});
- S.fin.forEach(x=>{fin+=x.pmt*ov(x.first,endF(x),f,t)/30.4375});
- const dep=S.car?S.car.value*(S.set.dep??.1)*n/365:0,cost=fuel+mt+vr+fx+fin,net=gross-cost;
- return{n,nd:D.length,h,km,gross,fuel,est,mt,vr,fx,fin,dep,cost,net,nph:h?net/h:0,mg:gross?net/gross:0,vc:fuel+mt+vr,fixM:(fx+fin)/n*30.4375}}
+function elig(v){
+  const motivos=[];
+  if(v.portas<4)motivos.push('Menos de 4 portas');
+  if(!v.ar)motivos.push('Sem ar-condicionado');
+  if(v.placaVermelha)motivos.push('Placa vermelha');
+  if(v.adesivado)motivos.push('Veículo adesivado');
+  if(v.sinistrado)motivos.push('Veículo sinistrado');
+  if(v.suspensao)motivos.push('Suspensão/freios alterados');
+  const rows=catalog().filter(r=>norm(r.marca+' '+r.modelo)===norm(v.modelo));
+  const cats=[];
+  if(!rows.length)return {motivos,cats,naoListado:true};
+  ['UberX','Comfort','Black'].forEach(cat=>{
+    const rs=rows.filter(r=>norm(r.cat)===norm(cat));
+    if(!rs.length)return;
+    const r=rs.find(x=>x.cidade!=='*'&&norm(x.cidade)===norm(v.cidade))||rs.find(x=>x.cidade==='*'||x.cidade==='');
+    if(!r){cats.push({cat,veiculoOk:false,motoristaOk:true,mot:['Categoria não disponível na cidade informada'],dm:[],conf:'NAO'});return}
+    const m=[...motivos];
+    if(v.ano<r.ano)m.push(`Ano mínimo ${r.ano} (o seu: ${v.ano})`);
+    if(r.excl&&r.excl<=today())m.push(`Modelo excluído desde ${fmtDate(r.excl)}`);
+    if(cat==='Black'&&!BLACK_COLORS.includes(norm(v.cor)))m.push('Cor não aceita no Black');
+    const dm=[];
+    if(cat!=='UberX'){
+      const min=cat==='Black'?4.85:S.settings.notaComfort;
+      if(!(S.settings.viagens>100))dm.push('Precisa de mais de 100 viagens');
+      if(S.settings.nota<min)dm.push(`Nota mínima ${nf(min)} (a sua: ${nf(S.settings.nota)})`);
+    }
+    cats.push({cat,veiculoOk:m.length===0,motoristaOk:dm.length===0,mot:m,dm,conf:r.conf,ano:r.ano});
+  });
+  return {motivos,cats};
+}
 
-function adv(){const r=rep(30),o=[],th=S.set.goalHour||25,goal=S.set.goalMonth||0;
- if(!r.nd)o.push(['>','Registre seus dias de trabalho (aba Ganhos) para receber estratégias personalizadas.']);
- else{
-  o.push([r.net<=0||r.nph<th?'!':'ok',`30 dias: líquido ${R(r.net)} (${R(r.nph)}/h, margem ${P(r.mg)}). `+(r.net<=0?'Você está pagando para trabalhar: revise custos fixos, financiamento e combustível.':r.nph<th?`Abaixo da sua meta de ${R(th)}/h.`:`Acima da sua meta de ${R(th)}/h.`)]);
-  const fs=r.gross?r.fuel/r.gross:0;
-  o.push([fs>=.4?'!':fs>=.3?'!':'ok',`Combustível consome ${P(fs)} do faturamento`+(fs>=.4?': não compensa nesse nível. Evite deslocamentos vazios longos e calibre os pneus.':fs>=.3?': no limite. Compare etanol e gasolina na aba Combustível.':'.')]);
-  if(r.km&&r.h){const fl=r.cost/r.km+th/(r.km/r.h);o.push(['>',`Piso por km: aceite corridas a partir de ~${R(fl)}/km (custo ${R(r.cost/r.km)}/km + sua meta por hora). Hoje você fatura ${R(r.gross/r.km)}/km.`])}
-  const cd=(r.gross-r.vc)/r.nd;
-  if(cd>0){o.push(['>',`Ponto de equilíbrio: ~${N(r.fixM/cd)} dias/mês só para pagar custos fixos e financiamento (${R(r.fixM)}/mês).`]);
-   if(goal)o.push(['>',`Meta de ${R(goal)} líquidos/mês: ~${N((goal+r.fixM)/cd)} dias de ${N(r.h/r.nd)}h no seu ritmo.`])}
-  else o.push(['!','Cada dia trabalhado não cobre nem o custo variável (combustível e manutenção). Corrija isso antes de rodar mais.'])}
- if(S.car&&S.car.fuel=='FLEX'&&lastP('G')&&lastP('E')){const kg=cons('G'),ke=cons('E')||kg*.7;o.push(['>',(lastP('E')/ke<lastP('G')/kg?'Etanol':'Gasolina')+' compensa mais nos últimos preços registrados.'])}
- const mg=r.gross/r.n*30.4375;
- S.fin.filter(x=>x.n>paid(x)).forEach(x=>{const t=`Financiamento: faltam ${x.n-paid(x)} parcelas (${R((x.n-paid(x))*x.pmt)}), juros ~${P(rate(x))} a.m.`;
-  o.push([mg&&x.pmt/mg>.25?'!':'ok',t+(mg&&x.pmt/mg>.25?` A parcela pesa ${P(x.pmt/mg)} do faturamento mensal: risco alto de aperto.`:'')])});
- ((S.car&&S.car.cats)||[]).filter(k=>k!='X').forEach(k=>{const tr=S.set.trips||0,rt=S.set.rating||0,mr=minR(k),miss=Math.max(0,101-tr);
-  o.push(miss>0||rt<mr?['>',`Seu carro é elegível ao ${CN[k]}, mas faltam requisitos do motorista: ${miss} viagens (mais de 100) e nota mínima ${N(mr)}${rt?'':' (informe sua nota em Mais)'}.`]:['ok',`Você atende aos requisitos de motorista do ${CN[k]}: ative a categoria no app.`])});
- return o}
+/* ================= Cálculos ================= */
+function consumption(){
+  const groups={};
+  S.fuel.forEach(f=>{const k=f.vehicleId+'|'+f.comb;(groups[k]=groups[k]||[]).push(f)});
+  const out=[];
+  for(const k in groups){
+    const arr=groups[k].filter(f=>f.odo>0).sort((a,b)=>a.odo-b.odo);
+    let last=null,lit=0,cost=0,km=0,L=0,C=0;
+    arr.forEach(f=>{
+      if(last===null){if(f.cheio)last=f.odo;return}
+      lit+=f.litros;cost+=f.total;
+      if(f.cheio){km+=f.odo-last;L+=lit;C+=cost;last=f.odo;lit=0;cost=0}
+    });
+    if(L>0&&km>0){const [vehicleId,comb]=k.split('|');out.push({vehicleId,comb,km,litros:L,custo:C,cons:km/L,ckm:C/km})}
+  }
+  return out;
+}
+function costPerKm(){
+  const c=consumption(),km=sum(c,'km');
+  if(km>0)return sum(c,'custo')/km;
+  for(const f of sorted(S.fuel)){
+    const v=S.vehicles.find(x=>x.id===f.vehicleId),cons=v&&v.cons[f.comb];
+    if(cons>0&&f.preco>0)return f.preco/cons;
+  }
+  return 0;
+}
+function expInRange(e,from,to){
+  if(e.rec==='unico')return e.data>=from&&e.data<=to?e.valor:0;
+  const s=e.data>from?e.data:from;
+  if(s>to)return 0;
+  const d=dayNum(to)-dayNum(s)+1;
+  return e.valor*d/(e.rec==='anual'?365:30.4375);
+}
+function implicitRate(pv,pmt,n){
+  if(pv<=0||pmt*n<=pv)return 0;
+  let lo=0,hi=1;
+  for(let i=0;i<100;i++){const mid=(lo+hi)/2;const val=pmt*(1-Math.pow(1+mid,-n))/mid;if(val>pv)lo=mid;else hi=mid}
+  return (lo+hi)/2;
+}
+function report(from,to){
+  const dias=dayNum(to)-dayNum(from)+1,inR=d=>d>=from&&d<=to;
+  const wd=S.workdays.filter(w=>inR(w.data));
+  const ganhos=sum(wd,'ganhos'),gorj=sum(wd,'gorjetas'),km=sum(wd,'km'),horas=sum(wd,'horas'),corridas=sum(wd,'corridas');
+  const bruto=ganhos+gorj;
+  const fl=S.fuel.filter(f=>inR(f.data));
+  let comb=sum(fl,'total'),est=false;
+  if(!fl.length&&km>0){const c=costPerKm();if(c>0){comb=km*c;est=true}}
+  const porTipo={};let custos=0;
+  S.expenses.forEach(e=>{const v=expInRange(e,from,to);if(v>0){custos+=v;porTipo[e.tipo]=(porTipo[e.tipo]||0)+v}});
+  const fin=S.financings.reduce((t,f)=>t+(f.pagas<f.n?f.parcela*dias/30.4375:0),0);
+  const dep=S.vehicles.reduce((t,v)=>t+v.valor*S.settings.depreciacao/100*dias/365,0);
+  const caixa=bruto-comb-custos-fin;
+  return {from,to,dias,nDias:wd.length,ganhos,gorj,bruto,km,horas,corridas,comb,est,custos,porTipo,fin,dep,caixa,real:caixa-dep};
+}
+const FUEL_WARN=0.30,FUEL_BAD=0.40,FIN_RISK=0.25; // limites do Advisor
 
-/* ---------- telas ---------- */
-let tab='p',msg='';
-const TABS=[['p','Painel'],['g','Ganhos'],['b','Combustível'],['x','Custos'],['c','Carro'],['s','Mais']];
-const inp=(id,l,t='number',val='')=>`<div><label for="${id}">${l}</label><input id="${id}" type="${t}" ${t=='number'?'step="any" inputmode="decimal"':''} value="${val}"></div>`;
-const sel=(id,l,o)=>`<div><label for="${id}">${l}</label><select id="${id}">${o.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('')}</select></div>`;
-const need=()=>'<div class="card">Cadastre seu carro na aba <b>Carro</b> primeiro.</div>';
-const lst=(k,f)=>S[k].map((x,i)=>`<p>${f(x)}<button class="x" onclick="del('${k}',${i})">×</button></p>`).reverse().slice(0,30).join('')||'<p class="mu">Nenhum registro.</p>';
-const add=(k,o)=>{S[k].push(o);save();render()},del=(k,i)=>{S[k].splice(i,1);save();render()};
-function render(){$('#nav').innerHTML=TABS.map(t=>`<button class="${t[0]==tab?'on':''}" onclick="tab='${t[0]}';msg='';render()">${t[1]}</button>`).join('');
- $('#app').innerHTML=(msg?`<div class="card">${msg}</div>`:'')+({p:painel,g:ganhos,b:comb,x:custos,c:carro,s:mais}[tab])();scrollTo(0,0)}
+/* ================= Componentes de formulário ================= */
+const F=(label,name,attrs='',type='number')=>`<label>${label}<input name="${name}" type="${type}" ${type==='number'?'step="any" inputmode="decimal"':''} ${attrs}></label>`;
+const SEL=(label,name,opts,sel='')=>`<label>${label}<select name="${name}">${opts.map(o=>{const [v,t]=Array.isArray(o)?o:[o,o];return `<option value="${esc(v)}"${v===sel?' selected':''}>${esc(t)}</option>`}).join('')}</select></label>`;
+const CHK=(label,name,on)=>`<label class="chk"><input type="checkbox" name="${name}"${on?' checked':''}> ${label}</label>`;
+const vOpts=()=>S.vehicles.map(v=>[v.id,`${v.modelo} ${v.ano}`]);
+const vn=id=>{const v=S.vehicles.find(x=>x.id===id);return v?`${v.modelo} ${v.ano}`:'Geral'};
+const card=h=>`<div class="card">${h}</div>`;
+const needVeh=()=>card('<p>Cadastre um veículo primeiro na aba <b>Veículo</b>.</p>');
+const delBtn=(c,id)=>`<button class="btn del" data-del="${c}:${id}" title="Excluir">×</button>`;
+const kpi=(t,v,cls='')=>`<div class="kpi"><b class="${cls}">${v}</b><span>${t}</span></div>`;
+const row=(a,b,cls='')=>`<tr><td>${a}</td><td class="r ${cls}">${b}</td></tr>`;
+function fd(form){const o={};new FormData(form).forEach((v,k)=>o[k]=v);form.querySelectorAll('input[type=checkbox]').forEach(c=>o[c.name]=c.checked);return o}
 
-function painel(){const n=S.per||30,r=rep(n),k=(l,x)=>`<div class="k"><small>${l}</small><b>${x}</b></div>`;
- return `<div class="card"><select onchange="S.per=+this.value;save();render()">${[7,30,90].map(x=>`<option value="${x}"${x==n?' selected':''}>Últimos ${x} dias</option>`).join('')}</select>
- <div class="big"><small>Lucro líquido (caixa)</small><b class="${r.net<0?'bad':'ok'}">${R(r.net)}</b></div>
- <div class="gk">${k('Faturamento',R(r.gross))}${k('Custos',R(r.cost))}${k('Líquido/hora',R(r.nph))}${k('Margem',P(r.mg))}${k('Fatur./km',R(r.km?r.gross/r.km:0))}${k('Custo/km',R(r.km?r.cost/r.km:0))}${k('Km / horas',N(r.km)+' / '+N(r.h))}${k('Lucro real*',R(r.net-r.dep))}</div>
- <p><small>*Descontando a depreciação estimada do carro.${r.est?' Combustível estimado: registre abastecimentos.':''}</small></p></div>
- <div class="card"><h3>Estratégias</h3>${adv().map(a=>`<p class="t ${a[0]=='!'?'w':a[0]=='ok'?'o':''}">${a[1]}</p>`).join('')}</div>`}
+/* ================= Telas ================= */
+let flash='';
+let REP={r:'30',from:today(),to:today()};
+const V={};
 
-function ganhos(){if(!S.car)return need();
- return `<div class="card"><h3>Registrar dia de trabalho</h3><div class="g">${inp('gd','Data','date',today())}${inp('gh','Horas online')}${inp('gk','Km rodados')}${inp('gt','Corridas')}${inp('ge','Ganhos (R$)')}${inp('gj','Gorjetas (R$)')}</div><button class="p" onclick="addDay()">Salvar dia</button></div>
- <div class="card"><h3>Últimos dias</h3>${lst('days',x=>`${br(x.d)} · ${N(x.h)}h · ${N(x.km)} km · ${x.tr} corridas · ${R(x.e+x.t)}`)}</div>`}
-function addDay(){const o={d:v('gd'),h:num('gh'),km:num('gk'),tr:num('gt')|0,e:num('ge'),t:num('gj')};if(!o.h||!o.e)return alert('Informe horas e ganhos.');add('days',o)}
+V.veiculo=()=>{
+  const models=[...new Set(catalog().map(r=>r.marca+' '+r.modelo))].sort();
+  const list=S.vehicles.map(v=>{
+    const e=elig(v);
+    let cats='';
+    if(e.naoListado)cats='<p class="warn">Modelo não encontrado no catálogo. Confira os requisitos no site da Uber ou importe seu catálogo em Configurações.</p>';
+    else if(!e.cats.length)cats='<p class="bad">Nenhuma categoria disponível para este modelo.</p>';
+    else cats=e.cats.map(c=>{
+      const ok=c.veiculoOk&&c.motoristaOk;
+      const why=[...c.mot,...c.dm];
+      const ref=c.conf!=='SIM'?' <span class="mut">(ano de referência, não conferido)</span>':'';
+      return `<div><span class="tag ${ok?'ok':c.veiculoOk?'warn':'bad'}">${c.cat}: ${ok?'aceito':c.veiculoOk?'veículo ok, falta requisito do motorista':'recusado'}</span>${ref}${why.length?`<div class="mut">${why.map(esc).join(' · ')}</div>`:''}</div>`;
+    }).join('');
+    if(e.motivos.length)cats=`<p class="bad">Problemas gerais: ${e.motivos.join(', ')}.</p>`+cats;
+    return card(`<div style="display:flex;justify-content:space-between"><h2>${esc(v.modelo)} ${v.ano} · ${esc(v.cor)}</h2>${delBtn('vehicles',v.id)}</div>
+      <p class="mut">${esc(v.cidade||'cidade não informada')} · Odômetro ${nf(v.odo,0)} km · Valor de mercado ${brl(v.valor)}</p>${cats}`);
+  }).join('');
+  return card(`<h2>Novo veículo</h2><form data-form="veiculo">
+    <datalist id="dl-modelos">${models.map(m=>`<option value="${esc(m)}">`).join('')}</datalist>
+    <datalist id="dl-cores">${['Preto','Cinza','Prata','Branco','Azul-marinho','Marrom','Chumbo','Vermelho','Azul','Verde','Amarelo','Bege'].map(c=>`<option value="${c}">`).join('')}</datalist>
+    <div class="grid">
+      <label>Modelo (escolha do catálogo)<input name="modelo" list="dl-modelos" required placeholder="Ex.: Honda Civic"></label>
+      ${F('Ano','ano','required min="1990" max="2100"')}
+      <label>Cor<input name="cor" list="dl-cores" required></label>
+      ${F('Portas','portas','value="4" min="2"')}
+      ${F('Cidade','cidade',`value="${esc(S.settings.cidade)}"`,'text')}
+      ${F('Odômetro atual (km)','odo','min="0" value="0"')}
+      ${F('Valor de mercado (R$)','valor','min="0" value="0"')}
+      ${F('Consumo declarado gasolina (km/l)','cg','min="0"')}
+      ${F('Consumo declarado etanol (km/l)','ce','min="0"')}
+      ${F('Consumo declarado elétrico (km/kWh)','ck','min="0"')}
+    </div>
+    <div class="grid">${CHK('Ar-condicionado','ar',true)}${CHK('Placa vermelha','pv')}${CHK('Adesivado','ad')}${CHK('Sinistrado','si')}${CHK('Suspensão/freios alterados','su')}</div>
+    <button class="btn">Salvar veículo</button></form>`)+(list||card('<p class="mut">Nenhum veículo cadastrado.</p>'));
+};
 
-function comb(){if(!S.car)return need();const fs=S.car.fuel=='ELETRICO'?['K']:S.car.fuel=='FLEX'?['G','E']:['G'],rl=real(),r=rep(30);
- const sh=r.gross?r.fuel/r.gross:0,ver=sh>=.4?'NÃO COMPENSA no ritmo atual':sh>=.3?'NO LIMITE':'COMPENSA';
- return `<div class="card"><h3>Está compensando?</h3>${fs.map(f=>`<p>${FN[f]}: consumo real ${rl[f]?N(rl[f]):'sem dados'} · declarado ${N(S.car[{G:'kg',E:'ke',K:'kwh'}[f]])}</p>`).join('')}
- <p>${r.gross?`Últimos 30 dias: combustível ${R(r.fuel)}${r.est?' (estimado)':''} = ${P(sh)} do faturamento → <b>${ver}</b>.`:'Registre dias de trabalho para medir o peso do combustível.'}</p>
- ${S.car.fuel=='FLEX'?`<div class="g">${inp('pg','Gasolina (R$/L)','number',lastP('G')||'')}${inp('pe','Etanol (R$/L)','number',lastP('E')||'')}</div><button class="p" onclick="cmp()">Comparar etanol × gasolina</button><p id="cmp"></p>`:`<p>Custo por km: ${R(fcpk())}</p>`}</div>
- <div class="card"><h3>Registrar abastecimento</h3><div class="g">${sel('uf','Combustível',fs.map(f=>[f,FN[f]]))}${inp('ud','Data','date',today())}${inp('uq','Quantidade (L ou kWh)')}${inp('up','Preço por unidade (R$)')}${inp('uo','Odômetro (km)')}<div><label>&nbsp;</label><label><input id="ufl" type="checkbox" checked>Tanque cheio</label></div></div><button class="p" onclick="addFuel()">Salvar</button>
- <p><small>O consumo real usa dois abastecimentos de tanque cheio com odômetro.</small></p></div>
- <div class="card"><h3>Abastecimentos</h3>${lst('fuel',x=>`${br(x.d)} · ${FN[x.f]} · ${N(x.q)} a ${R(x.p)} = ${R(x.q*x.p)}`)}</div>`}
-function cmp(){const pg=num('pg'),pe=num('pe'),kg=cons('G'),ke=cons('E')||kg*.7;if(!pg||!pe||!kg)return;const cg=pg/kg,ce=pe/ke;
- $('#cmp').innerHTML=`Custo por km: gasolina ${R(cg)} · etanol ${R(ce)}.<br>Etanol compensa se etanol/gasolina &lt; ${N(ke/kg)} (hoje: ${N(pe/pg)}).<br><b>Abasteça com ${ce<cg?'ETANOL':'GASOLINA'}</b> (economia ~${R(Math.abs(cg-ce)*100)} a cada 100 km).`}
-function addFuel(){const o={f:v('uf'),d:v('ud'),q:num('uq'),p:num('up'),odo:num('uo'),full:$('#ufl').checked};if(!o.q||!o.p)return alert('Informe quantidade e preço.');add('fuel',o)}
+V.financiamento=()=>{
+  if(!S.vehicles.length)return needVeh();
+  const list=S.financings.map(f=>{
+    const fin=f.valor-f.entrada,total=f.entrada+f.parcela*f.n,saldo=f.parcela*(f.n-f.pagas),taxa=implicitRate(fin,f.parcela,f.n);
+    return `<tr><td>${esc(vn(f.vehicleId))}</td><td class="r">${brl(f.parcela)}</td><td class="r">${f.pagas}/${f.n}</td><td class="r">${brl(saldo)}</td><td class="r">${brl(total)}</td><td class="r">${nf(taxa*100)}% a.m.</td><td>${delBtn('financings',f.id)}</td></tr>`;
+  }).join('');
+  return card(`<h2>Financiamento</h2><form data-form="financiamento"><div class="grid">
+    ${SEL('Veículo','vehicleId',vOpts())}
+    ${F('Valor à vista do veículo (R$)','valor','required min="0"')}
+    ${F('Entrada (R$)','entrada','value="0" min="0"')}
+    ${F('Valor da parcela (R$)','parcela','required min="0"')}
+    ${F('Nº de parcelas','n','required min="1"')}
+    ${F('Parcelas já pagas','pagas','value="0" min="0"')}
+  </div><button class="btn">Salvar financiamento</button></form>`)+
+  card(`<h2>Financiamentos</h2>${list?`<div class="tbl"><table><tr><th>Veículo</th><th class="r">Parcela</th><th class="r">Pagas</th><th class="r">Saldo devedor</th><th class="r">Custo total</th><th class="r">Taxa implícita</th><th></th></tr>${list}</table></div>`:'<p class="mut">Nenhum financiamento.</p>'}`);
+};
 
-function custos(){if(!S.car)return need();
- return `<div class="card"><h3>Novo custo</h3><div class="g">${sel('ek','Tipo',ET)}${sel('er','Recorrência',[['U','Única'],['M','Mensal'],['A','Anual (rateada)']])}${inp('ev','Valor (R$)')}${inp('ed','Data (início, se recorrente)','date',today())}</div><button class="p" onclick="addExp()">Adicionar custo</button></div>
- <div class="card"><h3>Custos</h3>${lst('exp',x=>`${br(x.d)} · ${ET.find(t=>t[0]==x.k)[1]} · ${R(x.v)} (${RN[x.r]})`)}</div>
- <div class="card"><h3>Novo financiamento</h3><div class="g">${inp('fv','Valor financiado (R$)')}${inp('dp','Entrada (R$)')}${inp('pm','Parcela (R$)')}${inp('fn','Nº de parcelas')}${inp('f1','1º vencimento','date',today())}</div><button class="p" onclick="addFin()">Adicionar financiamento</button></div>
- <div class="card"><h3>Financiamentos</h3>${lst('fin',x=>`${R(x.pmt)} × ${x.n} · pagas ${paid(x)} · saldo ${R((x.n-paid(x))*x.pmt)} · custo total ${R(x.dp+x.pmt*x.n)} · juros ~${P(rate(x))} a.m.`)}</div>`}
-function addExp(){const o={k:v('ek'),r:v('er'),v:num('ev'),d:v('ed')};if(!o.v)return alert('Informe o valor.');add('exp',o)}
-function addFin(){const o={fv:num('fv'),dp:num('dp'),pmt:num('pm'),n:num('fn')|0,first:v('f1')};if(!o.pmt||!o.n||!o.first)return alert('Informe parcela, nº de parcelas e vencimento.');add('fin',o)}
+V.custos=()=>{
+  const tipos=['Manutenção','Óleo','Pneus','Freios','Revisão','Seguro','IPVA','Licenciamento','Lavagem','Multa','Pedágio','Estacionamento','Outro'];
+  const list=sorted(S.expenses).map(e=>`<tr><td>${fmtDate(e.data)}</td><td>${esc(e.tipo)}</td><td>${esc(e.desc)}</td><td>${e.rec}</td><td>${esc(vn(e.vehicleId))}</td><td class="r">${brl(e.valor)}</td><td>${delBtn('expenses',e.id)}</td></tr>`).join('');
+  return card(`<h2>Novo custo</h2><form data-form="custo"><div class="grid">
+    ${F('Data (início)','data',`required value="${today()}"`,'date')}
+    ${SEL('Tipo','tipo',tipos)}
+    ${F('Descrição','desc','','text')}
+    ${F('Valor (R$)','valor','required min="0"')}
+    ${SEL('Recorrência','rec',[['unico','Único'],['mensal','Mensal'],['anual','Anual']])}
+    ${SEL('Veículo','vehicleId',[['','Geral'],...vOpts()])}
+  </div><p class="mut">Custos mensais são rateados por dia (valor × dias ÷ 30,4375) e anuais (valor × dias ÷ 365), a partir da data de início.</p><button class="btn">Salvar custo</button></form>`)+
+  card(`<h2>Custos cadastrados</h2>${list?`<div class="tbl"><table><tr><th>Data</th><th>Tipo</th><th>Descrição</th><th>Recorrência</th><th>Veículo</th><th class="r">Valor</th><th></th></tr>${list}</table></div>`:'<p class="mut">Nenhum custo.</p>'}`);
+};
 
-function carro(){const c=S.car,names=[...new Set(CAT.map(e=>e.make+' '+e.model))];
- const cityBox=`<div class="card"><h3>Sua cidade</h3><p><small>As regras da Uber variam por cidade.</small></p><input value="${S.city}" placeholder="Ex.: São Paulo" onchange="S.city=this.value;save()"></div>`;
- if(c)return cityBox+`<div class="card"><h3>${c.make} ${c.model} ${c.year}</h3><p>Cor ${c.color} · ${N(c.odo)} km · valor ${R(c.value)}</p><p>Categorias aceitas: <b class="ok">${c.cats.map(k=>CN[k]).join(', ')}</b></p><button class="p" onclick="if(confirm('Trocar de carro?')){S.car=null;save();render()}">Trocar carro</button></div>`;
- return cityBox+`<div class="card"><h3>Cadastrar carro</h3><label for="mdl">Modelo (só carros do catálogo)</label><input id="mdl" list="ml" placeholder="Digite: onix, virtus, corolla…" onchange="fillCar()"><datalist id="ml">${names.map(n=>`<option value="${n}">`).join('')}</datalist>
- <div class="g">${inp('yr','Ano de fabricação')}${inp('col','Cor','text')}${inp('kg','Consumo gasolina (km/l)')}${inp('ke','Consumo etanol (km/l)')}${inp('kw','Consumo elétrico (km/kWh)')}${inp('cv','Valor de mercado (R$)')}${inp('co','Odômetro (km)')}</div>
- <p><label><input id="ac" type="checkbox" checked>Ar-condicionado funcionando</label><label><input id="bad" type="checkbox">Placa vermelha, adesivado, sinistrado ou suspensão/freios alterados</label></p>
- <button class="p" onclick="regCar()">Verificar e cadastrar</button></div>`}
-function fillCar(){const e=findE(v('mdl'));if(e){$('#kg').value=e.kg||'';$('#ke').value=e.ke||'';$('#kw').value=e.kwh||''}}
-function regCar(){if(!S.city){msg='Informe sua cidade primeiro.';return render()}
- const e=findE(v('mdl'));if(!e){msg='Modelo fora do catálogo, então não dá para validar. Confira a lista oficial da Uber e acrescente o modelo na constante CAT do index.html.';return render()}
- if($('#bad').checked){msg='Placa vermelha, adesivado, sinistrado ou com suspensão/freios alterados não é aceito pela Uber.';return render()}
- const y=num('yr'),col=v('col'),res=elig(e,y,col,$('#ac').checked),ok=res.filter(r=>r.ok).map(r=>r.k);
- msg=`<b>Elegibilidade de ${e.make} ${e.model} ${y} em ${S.city}:</b><br>`+res.map(r=>`${r.ok?'✅':'❌'} ${CN[r.k]}: ${r.why}`).join('<br>')+'<br><small>Dados de referência: confirme no app da Uber antes de comprar ou financiar.</small>';
- if(!ok.length){msg+='<br><b>Este carro não é aceito. Cadastro cancelado.</b>';return render()}
- S.car={make:e.make,model:e.model,year:y,color:col,fuel:e.fuel,kg:num('kg'),ke:num('ke'),kwh:num('kw'),value:num('cv'),odo:num('co'),cats:ok};save();render()}
+V.abastecimento=()=>{
+  if(!S.vehicles.length)return needVeh();
+  const cons=consumption().map(c=>{
+    const v=S.vehicles.find(x=>x.id===c.vehicleId),dec=v?v.cons[c.comb]:0;
+    const bad=dec>0&&c.cons<dec*0.85;
+    return `<tr><td>${esc(vn(c.vehicleId))}</td><td>${COMB[c.comb]}</td><td class="r">${nf(c.cons)}</td><td class="r">${dec?nf(dec):'-'}</td><td class="r">${brl(c.ckm)}</td><td class="${bad?'bad':'ok'}">${bad?'Consumo 15%+ pior que o declarado':'OK'}</td></tr>`;
+  }).join('');
+  const list=sorted(S.fuel).slice(0,30).map(f=>`<tr><td>${fmtDate(f.data)}</td><td>${esc(vn(f.vehicleId))}</td><td>${COMB[f.comb]}</td><td class="r">${nf(f.litros)}</td><td class="r">${brl(f.preco)}</td><td class="r">${brl(f.total)}</td><td class="r">${nf(f.odo,0)}</td><td>${f.cheio?'cheio':'parcial'}</td><td>${delBtn('fuel',f.id)}</td></tr>`).join('');
+  return card(`<h2>Novo abastecimento</h2><form data-form="abastecimento"><div class="grid">
+    ${F('Data','data',`required value="${today()}"`,'date')}
+    ${SEL('Veículo','vehicleId',vOpts())}
+    ${SEL('Combustível','comb',Object.entries(COMB))}
+    ${F('Litros / kWh','litros','required min="0"')}
+    ${F('Preço por litro/kWh (R$)','preco','min="0"')}
+    ${F('Total pago (R$) — opcional se informou o preço','total','min="0"')}
+    ${F('Odômetro (km)','odo','required min="0"')}
+  </div>${CHK('Tanque cheio','cheio',true)}<br><button class="btn">Salvar abastecimento</button></form>
+  <p class="mut">O consumo real é calculado pelo método do tanque cheio (precisa de pelo menos dois abastecimentos com tanque cheio).</p>`)+
+  card(`<h2>Consumo real</h2>${cons?`<div class="tbl"><table><tr><th>Veículo</th><th>Combustível</th><th class="r">Real (km/l)</th><th class="r">Declarado</th><th class="r">Custo/km</th><th>Situação</th></tr>${cons}</table></div>`:'<p class="mut">Ainda sem dados suficientes.</p>'}`)+
+  card(`<h2>Últimos abastecimentos</h2>${list?`<div class="tbl"><table><tr><th>Data</th><th>Veículo</th><th>Comb.</th><th class="r">Litros</th><th class="r">Preço</th><th class="r">Total</th><th class="r">Odômetro</th><th></th><th></th></tr>${list}</table></div>`:'<p class="mut">Nenhum abastecimento.</p>'}`);
+};
 
-function mais(){const s=S.set;
- return `<div class="card"><h3>Metas e perfil</h3><div class="g">${inp('sm','Meta líquida/mês (R$)','number',s.goalMonth||'')}${inp('sh','Meta líquida/hora (R$)','number',s.goalHour||25)}${inp('sd','Depreciação anual (%)','number',(s.dep??.1)*100)}${inp('sr','Minha nota na Uber','number',s.rating||'')}${inp('st','Viagens feitas','number',s.trips||'')}</div><button class="p" onclick="saveSet()">Salvar</button></div>
- <div class="card"><h3>Backup</h3><p>Os dados ficam <b>só neste navegador</b>. Exporte um backup de vez em quando: se limpar os dados do navegador ou trocar de aparelho, é ele que traz tudo de volta.</p><button class="p" onclick="bkp()">Exportar backup</button><label>Importar backup</label><input type="file" accept="application/json" onchange="rst(event)"><button class="p" style="background:var(--bad);color:#fff" onclick="if(confirm('Apagar todos os dados?')){S=null;localStorage.removeItem('rf2');location.reload()}">Apagar todos os dados</button></div>
- <p><small>Projeto independente, sem vínculo com a Uber. Não é aconselhamento financeiro.</small></p>`}
-function saveSet(){S.set={goalMonth:num('sm'),goalHour:num('sh')||25,dep:(num('sd')||10)/100,rating:num('sr'),trips:num('st')|0};save();msg='Configurações salvas.';render()}
-function bkp(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S)],{type:'application/json'}));a.download='controle-uber-backup.json';a.click()}
-function rst(e){const f=new FileReader();f.onload=()=>{try{S=JSON.parse(f.result);save();msg='Backup restaurado.'}catch(x){msg='Arquivo inválido.'}render()};f.readAsText(e.target.files[0])}
+V.dia=()=>{
+  const list=sorted(S.workdays).slice(0,20).map(w=>{const b=w.ganhos+w.gorjetas;return `<tr><td>${fmtDate(w.data)}</td><td class="r">${nf(w.horas,1)}</td><td class="r">${nf(w.km,0)}</td><td class="r">${w.corridas}</td><td class="r">${brl(w.ganhos)}</td><td class="r">${brl(w.gorjetas)}</td><td class="r">${brl(w.horas?b/w.horas:0)}</td><td class="r">${brl(w.km?b/w.km:0)}</td><td>${delBtn('workdays',w.id)}</td></tr>`}).join('');
+  return card(`<h2>Dia de trabalho</h2><form data-form="dia"><div class="grid">
+    ${F('Data','data',`required value="${today()}"`,'date')}
+    ${F('Horas trabalhadas','horas','required min="0"')}
+    ${F('Km rodados','km','required min="0"')}
+    ${F('Corridas','corridas','min="0" value="0"')}
+    ${F('Ganhos (R$)','ganhos','required min="0"')}
+    ${F('Gorjetas (R$)','gorjetas','min="0" value="0"')}
+  </div><button class="btn">Salvar dia</button></form>`)+
+  card(`<h2>Últimos dias</h2>${list?`<div class="tbl"><table><tr><th>Data</th><th class="r">Horas</th><th class="r">Km</th><th class="r">Corridas</th><th class="r">Ganhos</th><th class="r">Gorjetas</th><th class="r">R$/h</th><th class="r">R$/km</th><th></th></tr>${list}</table></div>`:'<p class="mut">Nenhum dia registrado.</p>'}`);
+};
+
+function range(){
+  const t=today();
+  switch(REP.r){case 'hoje':return [t,t];case '7':return [addDays(t,-6),t];case 'mes':return [t.slice(0,8)+'01',t];case '30':return [addDays(t,-29),t];default:return [REP.from,REP.to]}
+}
+V.relatorio=()=>{
+  const [from,to]=range();
+  const sel=`<div class="grid">
+    <label>Período<select data-rep="r">${[['hoje','Hoje'],['7','Últimos 7 dias'],['mes','Mês atual'],['30','Últimos 30 dias'],['livre','Período livre']].map(([v,t])=>`<option value="${v}"${REP.r===v?' selected':''}>${t}</option>`).join('')}</select></label>
+    ${REP.r==='livre'?`<label>De<input type="date" data-rep="from" value="${REP.from}"></label><label>Até<input type="date" data-rep="to" value="${REP.to}"></label>`:''}</div>`;
+  if(from>to)return card(`<h2>Relatório</h2>${sel}<p class="bad">A data inicial é maior que a final.</p>`);
+  const r=report(from,to);
+  const fuelShare=r.bruto>0?r.comb/r.bruto:0,finShare=r.bruto>0?r.fin/r.bruto:0;
+  const alerts=[];
+  if(r.est)alerts.push('Sem abastecimentos no período: o combustível foi estimado (km × custo por km).');
+  if(fuelShare>FUEL_BAD)alerts.push(`Combustível em ${pct(fuelShare)} do faturamento: não compensa.`);
+  else if(fuelShare>FUEL_WARN)alerts.push(`Combustível em ${pct(fuelShare)} do faturamento: atenção.`);
+  if(finShare>FIN_RISK)alerts.push(`Parcela em ${pct(finShare)} do faturamento: risco alto.`);
+  const tipos=Object.entries(r.porTipo).map(([t,v])=>row('&nbsp;&nbsp;'+esc(t),brl(v))).join('');
+  return card(`<h2>Relatório · ${fmtDate(from)} a ${fmtDate(to)}</h2>${sel}
+    <div class="kpis">${kpi('Lucro líquido (caixa)',brl(r.caixa),r.caixa>=0?'ok':'bad')}${kpi('Lucro real (com depreciação)',brl(r.real),r.real>=0?'ok':'bad')}${kpi('Faturamento',brl(r.bruto))}${kpi('R$/hora',brl(r.horas?r.bruto/r.horas:0))}${kpi('R$/km',brl(r.km?r.bruto/r.km:0))}</div>
+    ${alerts.map(a=>`<p class="warn">${a}</p>`).join('')}
+    <div class="tbl"><table>
+      ${row('Dias trabalhados no período',r.nDias)}${row('Horas',nf(r.horas,1))}${row('Km rodados',nf(r.km,0))}${row('Corridas',r.corridas)}
+      ${row('Ganhos',brl(r.ganhos))}${row('Gorjetas',brl(r.gorj))}
+      ${row('(−) Combustível'+(r.est?' (estimado)':''),brl(r.comb))}${row('(−) Custos',brl(r.custos))}${tipos}
+      ${row('(−) Financiamento (parcelas rateadas)',brl(r.fin))}
+      ${row('<b>Lucro líquido (caixa)</b>',`<b>${brl(r.caixa)}</b>`)}
+      ${row('(−) Depreciação',brl(r.dep))}
+      ${row('<b>Lucro real</b>',`<b>${brl(r.real)}</b>`)}
+    </table></div><br><button class="btn sec" data-act="csv">Exportar CSV</button>`);
+};
+
+V.combustivel=()=>{
+  const t=today(),r=report(addDays(t,-29),t),rk=r.km>0?r.bruto/r.km:0;
+  return card(`<h2>Etanol × gasolina</h2><form data-form="combustivel"><div class="grid">
+    ${F('Preço etanol (R$/l)','pe','required min="0"')}${F('Preço gasolina (R$/l)','pg','required min="0"')}
+    ${F('Consumo etanol (km/l)','ke','required min="0"')}${F('Consumo gasolina (km/l)','kg','required min="0"')}
+    ${F('Ganho médio por km (R$/km)','rk',`min="0" value="${rk?nf(rk).replace(',','.'):''}"`)}
+  </div><button class="btn">Calcular</button></form><div id="fuelOut"></div>
+  <p class="mut">Regra: etanol compensa quando preço_etanol ÷ preço_gasolina < km/l_etanol ÷ km/l_gasolina.</p>`);
+};
+
+V.estrategias=()=>{
+  const t=today(),r=report(addDays(t,-29),t);
+  let out='';
+  if(!r.nDias||r.km<=0)out=card('<p>Registre dias de trabalho (aba <b>Dia de trabalho</b>) para gerar estratégias com base nos últimos 30 dias.</p>');
+  else{
+    const s=S.settings,custoKm=(r.comb+r.custos+r.fin+r.dep)/r.km,piso=custoKm*(1+s.margem/100),rkm=r.bruto/r.km;
+    const f=r.bruto>0?r.comb/r.bruto:0,fixoDia=(r.custos+r.fin+r.dep)/r.dias;
+    out+=card(`<h2>Piso de R$/km para aceitar corridas</h2><p>Seu custo total é de <b>${brl(custoKm)}/km</b>. Com margem de ${nf(s.margem,0)}%, aceite corridas acima de <b>${brl(piso)}/km</b>. Seu ganho médio atual é de ${brl(rkm)}/km ${rkm>=piso?'<span class="ok">(acima do piso)</span>':'<span class="bad">(abaixo do piso)</span>'}.</p>`);
+    if(f<1){
+      const be=fixoDia/(1-f),G=(s.meta+fixoDia*30.4375)/(1-f),porDia=G/Math.max(1,s.diasMes);
+      out+=card(`<h2>Ponto de equilíbrio</h2><p>Custos fixos rateados: ${brl(fixoDia)}/dia (custos + financiamento + depreciação). Combustível consome ${pct(f)} do faturamento. Você precisa faturar cerca de <b>${brl(be)}/dia</b> (≈ ${nf(be/rkm,0)} km) para empatar.</p>`);
+      out+=card(`<h2>Plano para a meta mensal</h2><p>Para um lucro de ${brl(s.meta)}/mês, o faturamento necessário é de <b>${brl(G)}</b> no mês. Trabalhando ${s.diasMes} dias, são <b>${brl(porDia)}/dia</b>, ou cerca de ${nf(porDia/rkm,0)} km/dia ao ritmo atual de ${brl(rkm)}/km. Ajuste a meta e os dias em Configurações.</p>`);
+    }
+    const parc=S.financings.reduce((a,x)=>a+(x.pagas<x.n?x.parcela:0),0);
+    if(parc>0){
+      const rev=r.bruto/r.dias*30.4375,sh=rev>0?parc/rev:0;
+      out+=card(`<h2>Peso do financiamento</h2><p>Parcelas somam ${brl(parc)}/mês, cerca de <b class="${sh>FIN_RISK?'bad':'ok'}">${pct(sh)}</b> do faturamento mensal estimado (${brl(rev)}). ${sh>FIN_RISK?'Acima de 25%: risco alto.':'Dentro do limite de 25%.'}</p>`);
+    }
+  }
+  // dias da semana
+  const wk=Array.from({length:7},()=>({n:0,b:0,h:0}));
+  S.workdays.forEach(w=>{const [y,m,d]=w.data.split('-').map(Number),i=new Date(y,m-1,d).getDay();wk[i].n++;wk[i].b+=w.ganhos+w.gorjetas;wk[i].h+=w.horas});
+  const used=wk.map((x,i)=>({...x,i})).filter(x=>x.n>0);
+  if(used.length){
+    const rank=[...used].sort((a,b)=>b.b/b.n-a.b/a.n);
+    out+=card(`<h2>Dias da semana</h2><p>Melhor dia: <b>${DIAS[rank[0].i]}</b> (média ${brl(rank[0].b/rank[0].n)}). ${rank.length>1?`Pior dia: <b>${DIAS[rank[rank.length-1].i]}</b> (média ${brl(rank[rank.length-1].b/rank[rank.length-1].n)}).`:''}</p>
+      <div class="tbl"><table><tr><th>Dia</th><th class="r">Registros</th><th class="r">Média/dia</th><th class="r">R$/h</th></tr>${used.map(x=>`<tr><td>${DIAS[x.i]}</td><td class="r">${x.n}</td><td class="r">${brl(x.b/x.n)}</td><td class="r">${brl(x.h?x.b/x.h:0)}</td></tr>`).join('')}</table></div>`);
+  }
+  // subir de categoria
+  const up=S.vehicles.map(v=>{
+    const e=elig(v);
+    const falta=e.cats.filter(c=>!(c.veiculoOk&&c.motoristaOk));
+    if(!falta.length)return '';
+    return `<p><b>${esc(v.modelo)} ${v.ano}</b></p>`+falta.map(c=>`<p class="mut">${c.cat}: ${[...c.mot,...c.dm].map(esc).join(' · ')}</p>`).join('');
+  }).join('');
+  if(up)out+=card(`<h2>Requisitos para subir de categoria</h2>${up}`);
+  return out;
+};
+
+const INT={oleo:['Troca de óleo',10000],pneus:['Pneus',40000],freios:['Freios',30000],revisao:['Revisão',10000]};
+V.lembretes=()=>{
+  if(!S.vehicles.length)return needVeh();
+  return S.vehicles.map(v=>card(`<h2>${esc(v.modelo)} ${v.ano}</h2>
+    <form data-form="odo" class="grid"><input type="hidden" name="id" value="${v.id}">${F('Odômetro atual (km)','odo',`value="${v.odo}" min="0"`)}<label>&nbsp;<button class="btn">Atualizar km</button></label></form>
+    <div class="tbl"><table><tr><th>Item</th><th>Intervalo</th><th>Último (km)</th><th>Situação</th><th></th></tr>
+    ${Object.entries(INT).map(([k,[nm,iv]])=>{
+      const last=(v.maint||{})[k];
+      let st='<span class="mut">Sem registro</span>';
+      if(last!=null){const rest=last+iv-v.odo;st=rest<0?`<span class="bad">Atrasado em ${nf(-rest,0)} km</span>`:rest<iv*0.1?`<span class="warn">Faltam ${nf(rest,0)} km</span>`:`<span class="ok">Faltam ${nf(rest,0)} km</span>`}
+      return `<tr><td>${nm}</td><td>${nf(iv,0)} km</td><td>${last!=null?nf(last,0):'-'}</td><td>${st}</td><td><button class="btn sec" data-maint="${v.id}:${k}">Feito agora</button></td></tr>`;
+    }).join('')}</table></div>
+    <p class="mut">Intervalos são sugestões genéricas: siga o manual do carro.</p>`)).join('');
+};
+
+V.config=()=>{
+  const s=S.settings;
+  return card(`<h2>Configurações</h2><form data-form="config"><div class="grid">
+    ${F('Cidade','cidade',`value="${esc(s.cidade)}"`,'text')}
+    ${F('Viagens realizadas','viagens',`value="${s.viagens}" min="0"`)}
+    ${F('Sua nota atual','nota',`value="${s.nota}" min="0" max="5"`)}
+    ${F('Nota mínima Comfort (varia por cidade)','notaComfort',`value="${s.notaComfort}" min="0" max="5"`)}
+    ${F('Depreciação (% ao ano)','depreciacao',`value="${s.depreciacao}" min="0"`)}
+    ${F('Margem desejada sobre o custo (%)','margem',`value="${s.margem}" min="0"`)}
+    ${F('Meta de lucro mensal (R$)','meta',`value="${s.meta}" min="0"`)}
+    ${F('Dias trabalhados por mês','diasMes',`value="${s.diasMes}" min="1" max="31"`)}
+  </div><button class="btn">Salvar configurações</button></form>`)+
+  card(`<h2>Catálogo de veículos</h2><p class="mut">A Uber não oferece API pública. O catálogo embutido usa valores de referência e pode estar desatualizado: confira em uber.com/br/pt-br/drive/vehicle-requirements e importe seu CSV corrigido (colunas: marca;modelo;categoria;ano_minimo;cidade;excluido_desde;conferido_uber). Catálogo atual: <b>${S.catalog?'importado':'embutido'}</b>.</p>
+    <label>Importar catálogo (CSV)<input type="file" accept=".csv,.txt" data-file="catalog"></label><br>
+    <button class="btn sec" data-act="catReset">Voltar ao catálogo embutido</button>`)+
+  card(`<h2>Backup dos dados</h2><p class="mut">Os dados ficam apenas neste navegador e aparelho. Limpar os dados do navegador apaga tudo, então faça backup de vez em quando. Use o backup também para levar os dados a outro aparelho.</p>
+    <button class="btn" data-act="export">Baixar backup (JSON)</button>
+    <label>Restaurar backup<input type="file" accept=".json" data-file="backup"></label><br>
+    <button class="btn del" data-act="wipe">Apagar todos os dados</button>`);
+};
+
+/* ================= Ações dos formulários ================= */
+const H={};
+H.veiculo=o=>{
+  S.vehicles.push({id:uid(),modelo:o.modelo.trim(),ano:N(o.ano),cor:o.cor.trim(),portas:N(o.portas),ar:o.ar,cidade:o.cidade.trim(),odo:N(o.odo),valor:N(o.valor),
+    cons:{gasolina:N(o.cg),etanol:N(o.ce),eletrico:N(o.ck)},placaVermelha:o.pv,adesivado:o.ad,sinistrado:o.si,suspensao:o.su,maint:{}});
+  flash='Veículo salvo.';
+};
+H.financiamento=o=>{
+  const n=N(o.n),parcela=N(o.parcela);
+  if(n<1||parcela<=0){alert('Informe parcela e número de parcelas válidos.');return false}
+  S.financings.push({id:uid(),vehicleId:o.vehicleId,valor:N(o.valor),entrada:N(o.entrada),parcela,n,pagas:Math.min(N(o.pagas),n)});
+  flash='Financiamento salvo.';
+};
+H.custo=o=>{S.expenses.push({id:uid(),data:o.data,tipo:o.tipo,desc:o.desc.trim(),valor:N(o.valor),rec:o.rec,vehicleId:o.vehicleId});flash='Custo salvo.'};
+H.abastecimento=o=>{
+  const litros=N(o.litros);let preco=N(o.preco),total=N(o.total);
+  if(litros<=0){alert('Informe a quantidade.');return false}
+  if(!total&&preco)total=litros*preco;
+  if(!preco&&total)preco=total/litros;
+  if(!total){alert('Informe o preço por litro ou o total pago.');return false}
+  const odo=N(o.odo);
+  S.fuel.push({id:uid(),data:o.data,vehicleId:o.vehicleId,comb:o.comb,litros,preco,total,odo,cheio:o.cheio});
+  const v=S.vehicles.find(x=>x.id===o.vehicleId);if(v&&odo>v.odo)v.odo=odo;
+  flash='Abastecimento salvo.';
+};
+H.dia=o=>{
+  const w={id:uid(),data:o.data,horas:N(o.horas),km:N(o.km),corridas:N(o.corridas),ganhos:N(o.ganhos),gorjetas:N(o.gorjetas)};
+  S.workdays.push(w);
+  const b=w.ganhos+w.gorjetas,ck=costPerKm(),comb=w.km*ck;
+  flash=`<b>Dia salvo.</b> Faturamento ${brl(b)} · ${brl(w.horas?b/w.horas:0)}/h · ${brl(w.km?b/w.km:0)}/km · `+(ck>0?`sobra após combustível: <b>${brl(b-comb)}</b> (combustível estimado em ${brl(comb)})`:'cadastre abastecimentos para calcular a sobra após combustível');
+};
+H.odo=o=>{const v=S.vehicles.find(x=>x.id===o.id);if(v)v.odo=N(o.odo);flash='Odômetro atualizado.'};
+H.config=o=>{
+  const s=S.settings;
+  s.cidade=o.cidade.trim();s.viagens=N(o.viagens);s.nota=N(o.nota);s.notaComfort=N(o.notaComfort);
+  s.depreciacao=N(o.depreciacao);s.margem=N(o.margem);s.meta=N(o.meta);s.diasMes=Math.max(1,N(o.diasMes));
+  flash='Configurações salvas.';
+};
+H.combustivel=o=>{
+  const pE=N(o.pe),pG=N(o.pg),kE=N(o.ke),kG=N(o.kg),rk=N(o.rk),out=$('#fuelOut');
+  if(!(pE>0&&pG>0&&kE>0&&kG>0)){out.innerHTML='<p class="bad">Preencha todos os preços e consumos.</p>';return false}
+  const ratio=pE/pG,lim=kE/kG,cE=pE/kE,cG=pG/kG;
+  let v,cls;
+  if(ratio<lim*0.97){v='Etanol compensa';cls='ok'}else if(ratio<=lim*1.03){v='No limite (diferença pequena)';cls='warn'}else{v='Gasolina compensa';cls='ok'}
+  let share='';
+  if(rk>0){
+    const sh=Math.min(cE,cG)/rk;
+    const vv=sh>FUEL_BAD?['Não compensa','bad']:sh>FUEL_WARN?['No limite','warn']:['Compensa','ok'];
+    share=`<p>Com ganho de ${brl(rk)}/km, o combustível mais barato consome <b>${pct(sh)}</b> do faturamento: <b class="${vv[1]}">${vv[0]}</b>.</p>`;
+  }
+  out.innerHTML=`<div class="kpis">${kpi('Etanol ÷ gasolina (preço)',pct(ratio))}${kpi('Limite (km/l etanol ÷ gasolina)',pct(lim))}${kpi('Custo/km etanol',brl(cE))}${kpi('Custo/km gasolina',brl(cG))}</div><h3 class="${cls}">${v}</h3>${share}`;
+  return false;
+};
+
+/* ================= Eventos ================= */
+function dl(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+document.addEventListener('submit',ev=>{
+  const f=ev.target.closest('form[data-form]');if(!f)return;
+  ev.preventDefault();
+  const h=H[f.dataset.form];if(!h)return;
+  const res=h(fd(f),f);
+  if(res===false)return;
+  save();
+  if(f.dataset.form!=='combustivel')render();
+});
+document.addEventListener('click',ev=>{
+  const b=ev.target.closest('[data-tab],[data-del],[data-act],[data-maint]');if(!b)return;
+  const d=b.dataset;
+  if(d.tab){tab=d.tab;localStorage.setItem('df_tab',tab);render();window.scrollTo(0,0);return}
+  if(d.del){
+    const [c,id]=d.del.split(':');
+    if(confirm('Excluir este registro?')){S[c]=S[c].filter(x=>x.id!==id);if(c==='vehicles')S.financings=S.financings.filter(f=>f.vehicleId!==id);save();render()}
+    return;
+  }
+  if(d.maint){const [id,k]=d.maint.split(':'),v=S.vehicles.find(x=>x.id===id);if(v){v.maint=v.maint||{};v.maint[k]=v.odo;save();render()}return}
+  if(d.act==='csv'){
+    const [from,to]=range(),r=report(from,to);
+    const L=[['Campo','Valor'],['Período',`${fmtDate(from)} a ${fmtDate(to)}`],['Dias trabalhados',r.nDias],['Horas',r.horas],['Km',r.km],['Corridas',r.corridas],['Ganhos',r.ganhos],['Gorjetas',r.gorj],['Combustível'+(r.est?' (estimado)':''),r.comb],['Custos',r.custos],['Financiamento',r.fin],['Lucro líquido (caixa)',r.caixa],['Depreciação',r.dep],['Lucro real',r.real]];
+    dl(`relatorio_${from}_${to}.csv`,'\ufeff'+L.map(l=>l.map(x=>typeof x==='number'?nf(x).replace(/\./g,''):x).join(';')).join('\n'),'text/csv');
+  }
+  if(d.act==='export')dl(`driverfinance_backup_${today()}.json`,JSON.stringify(S,null,2),'application/json');
+  if(d.act==='catReset'){S.catalog=null;save();flash='Catálogo embutido restaurado.';render()}
+  if(d.act==='wipe'&&confirm('Apagar TODOS os dados deste aparelho? Esta ação não pode ser desfeita.')){S=DEF();save();flash='Dados apagados.';render()}
+});
+document.addEventListener('change',ev=>{
+  const t=ev.target;
+  if(t.dataset.rep){REP[t.dataset.rep]=t.value;render();return}
+  if(t.dataset.file&&t.files[0]){
+    const rd=new FileReader();
+    rd.onload=()=>{
+      try{
+        if(t.dataset.file==='catalog'){
+          if(!parseCatalog(rd.result).length)throw new Error('vazio');
+          S.catalog=rd.result;flash='Catálogo importado.';
+        }else{
+          const o=JSON.parse(rd.result);
+          if(!Array.isArray(o.vehicles)||!Array.isArray(o.workdays))throw new Error('inválido');
+          S=merge(o);flash='Backup restaurado.';
+        }
+        save();render();
+      }catch(e){alert('Arquivo inválido.')}
+    };
+    rd.readAsText(t.files[0],'UTF-8');
+  }
+});
+
+/* ================= Início ================= */
+const TABS=[['dia','Dia de trabalho'],['relatorio','Relatórios'],['abastecimento','Abastecimento'],['custos','Custos'],['veiculo','Veículo'],['financiamento','Financiamento'],['combustivel','Combustível'],['estrategias','Estratégias'],['lembretes','Lembretes'],['config','Configurações']];
+let tab=localStorage.getItem('df_tab');
+if(!V[tab])tab='dia';
+function render(){
+  $('#tabs').innerHTML=TABS.map(([k,t])=>`<button data-tab="${k}" class="${k===tab?'on':''}">${t}</button>`).join('');
+  $('#view').innerHTML=(flash?`<div class="card flash">${flash}</div>`:'')+V[tab]();
+  flash='';
+}
 render();
 </script>
 </body>
