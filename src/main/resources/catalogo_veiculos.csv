@@ -1,0 +1,44 @@
+# CATÁLOGO DE VEÍCULOS - PONTO DE PARTIDA, NÃO É A BASE OFICIAL DA UBER.
+# A Uber não publica API/base de dados. A lista oficial (por cidade e por data) fica em:
+#   https://www.uber.com/br/pt-br/drive/vehicle-requirements/
+# Anos mínimos e consumos abaixo são VALORES DE REFERÊNCIA (conferido_uber=NAO). Confira e corrija antes de comprar ou financiar.
+# Como editar: copie este arquivo para ~/.driverfinance/catalogo.csv (tem prioridade) ou use Configurações > Importar catálogo.
+#
+# Colunas (separador ;):
+#  cidade        "*" = regra padrão; ou nome da cidade (regra da cidade vence a padrão)
+#  carroceria    hatch | sedan | suv  (pick-ups e vans NÃO são aceitas)
+#  ar            SIM | NAO
+#  combustivel   FLEX | GASOLINA | HIBRIDO | ELETRICO
+#  kml_*         consumo urbano aproximado em km/l; km_kwh para elétricos (0 = não se aplica)
+#  ano_min_*     ano mínimo de fabricação; 0 = modelo NÃO aceito na categoria
+#  excluido_de   categoria:AAAA-MM-DD separadas por | (modelo deixa de ser aceito nessa data). Ex.: COMFORT:2026-07-06
+#  conferido_uber SIM quando você validou a linha no site/app da Uber
+cidade;marca;modelo;carroceria;portas;ar;combustivel;kml_gasolina;kml_etanol;km_kwh;ano_min_x;ano_min_comfort;ano_min_black;excluido_de;conferido_uber;obs
+*;Chevrolet;Onix;hatch;4;SIM;FLEX;12.5;8.8;0;2012;0;0;;NAO;
+*;Chevrolet;Onix Plus;sedan;4;SIM;FLEX;12.5;8.8;0;2012;2020;0;;NAO;
+*;Chevrolet;Prisma;sedan;4;SIM;FLEX;11.5;8.0;0;2012;2018;0;;NAO;
+*;Hyundai;HB20;hatch;4;SIM;FLEX;12.3;8.6;0;2012;0;0;;NAO;
+*;Hyundai;HB20S;sedan;4;SIM;FLEX;12.0;8.4;0;2012;2020;0;;NAO;
+*;Fiat;Argo;hatch;4;SIM;FLEX;12.0;8.4;0;2012;0;0;;NAO;
+*;Fiat;Cronos;sedan;4;SIM;FLEX;11.8;8.2;0;2012;2020;0;;NAO;
+*;Fiat;Mobi;hatch;4;SIM;FLEX;13.5;9.5;0;2012;0;0;;NAO;
+*;Renault;Kwid;hatch;4;SIM;FLEX;14.0;9.8;0;2012;0;0;;NAO;
+*;Renault;Sandero;hatch;4;SIM;FLEX;12.0;8.4;0;2012;0;0;;NAO;
+*;Renault;Logan;sedan;4;SIM;FLEX;11.5;8.0;0;2012;2020;0;COMFORT:2026-07-06;NAO;Fora do Comfort desde 06/07/2026 (comunicado Uber), segue elegível ao UberX.
+*;Renault;Duster;suv;4;SIM;FLEX;10.5;7.3;0;2012;2020;2023;;NAO;
+São Paulo;Renault;Duster;suv;4;SIM;FLEX;10.5;7.3;0;2012;2020;2023;;NAO;Black em SP: ano mínimo 2023 (comunicado Uber, out/2025).
+*;Volkswagen;Gol;hatch;4;SIM;FLEX;12.0;8.4;0;2012;0;0;;NAO;
+*;Volkswagen;Polo;hatch;4;SIM;FLEX;12.0;8.4;0;2012;0;0;;NAO;
+*;Volkswagen;Voyage;sedan;4;SIM;FLEX;11.5;8.0;0;2012;2018;0;;NAO;
+*;Volkswagen;Virtus;sedan;4;SIM;FLEX;11.5;8.0;0;2012;2020;2022;;NAO;
+São Paulo;Volkswagen;Virtus;sedan;4;SIM;FLEX;11.5;8.0;0;2012;2020;2025;;NAO;Black em SP: ano mínimo 2025 (comunicado Uber, out/2025).
+*;Nissan;Versa;sedan;4;SIM;FLEX;11.5;8.0;0;2012;2020;2022;;NAO;
+*;Nissan;Kicks;suv;4;SIM;FLEX;11.5;8.0;0;2012;2020;0;;NAO;
+*;Honda;City;sedan;4;SIM;FLEX;11.5;8.0;0;2012;2020;2022;;NAO;
+*;Honda;Civic;sedan;4;SIM;FLEX;11.0;7.7;0;2012;2018;2018;;NAO;
+*;Toyota;Corolla;sedan;4;SIM;FLEX;11.0;7.7;0;2012;2018;2018;;NAO;
+*;Toyota;Corolla Hybrid;sedan;4;SIM;HIBRIDO;16.0;0;0;2020;2020;2020;;NAO;
+*;Toyota;Yaris Sedan;sedan;4;SIM;FLEX;11.5;8.0;0;2012;2020;0;;NAO;
+*;Peugeot;208;hatch;4;SIM;FLEX;12.0;8.4;0;2012;0;0;;NAO;
+*;Peugeot;2008;suv;4;SIM;FLEX;11.0;7.7;0;2012;2020;2022;;NAO;
+*;BYD;Dolphin;hatch;4;SIM;ELETRICO;0;0;7.0;2023;2023;2023;;NAO;Black: cadastro permitido só até 31/12/2026 (comunicado Uber), depois sai da categoria.
